@@ -1,0 +1,244 @@
+body {
+	background: transparent;
+}
+
+
+
+* {
+	font-family: 'Open Sans', sans-serif;
+}
+
+
+/* Background style */
+#particles-js {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	background-size: cover;
+	background-position: center 75%;
+}
+
+#particles-js > canvas {
+	background-color: rgb(103,124,131);
+}
+
+/*
+ * Some bootstrap overrides
+ */
+
+.full {
+background-color: rgb(68,78,82);
+-webkit-background-size: cover;
+-moz-background-size: cover;
+-o-background-size: cover;
+background-size: cover;
+}
+.table{
+	position:relative;
+}
+.table > thead > tr > th {
+   background-color: rgba(0, 0, 0, 0.5); 
+   color: #eee;
+}
+.table-striped > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
+   background-color: rgba(255, 255, 255, 0.75);
+}
+.table-striped > tbody > tr:nth-child(2n) > td, .table-striped > tbody > tr:nth-child(2n) > th {
+   background-color: rgba(255, 255, 255, 0.5);
+}
+.navbar-fixed-bottom {
+    height: 32px !important;
+    padding-top: 6px;
+    padding-right: 64px;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+.navbar-fixed-bottom a {
+    color: #aaa;
+}
+
+/*
+ * Landing page
+ */
+
+.landing-page {
+    padding-top: 70px;
+	padding-bottom: 40px;
+}
+
+.landing-page h1 {
+    text-align: center;
+    padding-bottom: 20px;
+}
+
+/*
+ * Main circle
+ */
+
+.main {
+	position: relative;
+	top: 20px;
+	padding: 20px 0;
+    text-align:center;
+	background-color: rgba(255, 255, 255, 0.75);
+}
+
+.main > p {
+
+    padding-left: 50px;
+    padding-right: 50px;
+    font-size: 14pt;
+}
+
+.white {
+    color: #ddd; /* I lied */
+    padding-top: 8px;
+}
+
+/*
+ * Tasks page
+ */
+
+.category-column > a{
+	float: left;
+	clear: left;
+}
+
+.category-column{
+	float: left;
+}
+
+
+.chall-box-score {
+	z-index:100;
+	position:relative;
+	width: 130px;
+	left: 0;
+	top: 40px;
+	text-align:center;
+	font-size: 20pt
+}
+.chall-box {
+	margin: 20px;
+	display: inline-block;
+	position: relative;
+	width: 120px;
+	height: 120px;
+	border-radius: 50%;
+	background-color: #e5e5e5;
+	background-image: linear-gradient(to right, transparent 50%, green  0);
+	color: black;
+	text-align: center;
+	
+}
+
+@keyframes spin {
+	to { transform: rotate(.5turn); }
+}
+@keyframes bg {
+	50% { background: green; }
+}   
+
+.chall-box::before {
+	content: '';
+	position: absolute;
+	top: 0; left: 50%;
+	width: 50%; height: 100%;
+	border-radius: 0 100% 100% 0 / 50%;
+	background-color: inherit;
+	transform-origin: left;
+	animation: spin 50s linear infinite, bg 100s step-end infinite;
+	animation-play-state: paused;
+	animation-delay: inherit;
+}
+
+.chall-box::after{
+	content: '';
+	top: 7px; left: 7px;
+	width: 106px; height: 106px;
+	position:absolute;
+	border-radius: 100%;
+	background-color: #ccc;
+}
+
+
+.add-box {
+
+    margin: 50px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    text-align:center;
+    background-color: rgba(0,0,0,0.25);
+    font-size: 30pt;
+    color: white;
+}
+
+.chall-category {
+	margin: 20px;
+	width: 119px;
+	height: 119px;
+	padding-top: 45px;
+	border-radius: 50%;
+	text-align: center;
+    background-color: rgba(0, 0, 0, 0.5);
+	font-size: 16pt;
+    color: white;
+}
+
+.chall-done {
+    -webkit-box-shadow: 0 0 10px 5px #51A351;
+    box-shadow: 0 0 10px 5px #51A351;
+}
+
+.chall-highlight {
+    -webkit-box-shadow: 0 0 10px 3px #0088CC;
+    box-shadow: 0 0 10px 3px #0088CC;
+}
+
+.chall-hidden {
+	margin: 20px;
+	width: 120px;
+	height: 120px;
+	padding-top: 45px;
+    background-color: rgba(255, 255, 255, 0);
+}
+
+/*
+ * Individual tasks
+ */
+
+.task-box {
+    background-color: rgba(255, 255, 255, 0.75);
+    padding-bottom: 20px;
+    max-width: 600px;
+}
+
+.task-box input {
+    margin-bottom: 8px;
+}
+
+.task-box h1 {
+    padding-bottom: 0px;
+}
+
+.task-box h5 {
+    text-align: center;
+}
+
+.admin-task-button {
+	position: absolute;
+	top: 0;
+	padding: 15px;
+	font-size: 20pt;
+	background-color: #999;
+	color: black;
+}
+
+#task-edit-button {
+	right: 0;
+}
+
+#task-delete-button {
+	left: 0;
+}

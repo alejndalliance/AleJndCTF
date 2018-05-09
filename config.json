@@ -1,0 +1,22 @@
+{
+    "secret_key": "PLEASE_CHANGE_ME",
+
+    "host": "0.0.0.0",
+    "port": 8888,
+
+    "isJeopardy": false,
+	"isProxied": false,
+    "csrf_enabled": false,
+    "username_regex": "^[a-zA-Z0-9-_. &']+$",
+
+	"startTime": "5-9-18 8:00AM",
+    "stopTime": "5-9-18 10:39PM",
+    "stopScoreboard": "5-9-18 4:13PM",
+
+    "db": "sqlite:///ctf.db?check_same_thread=False",
+
+    "language_file": "lang.json",
+    "language": "english",
+
+    "debug": true
+}

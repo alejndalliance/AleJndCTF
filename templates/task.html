@@ -1,0 +1,47 @@
+<div class="landing-page container">
+  <div class="row">
+	  <div class="task-box col-md-6 col-md-offset-3" >
+	  {% if user.isAdmin %}
+		  <a href="delete">
+			  <span id="task-delete-button" class="glyphicon glyphicon-trash admin-task-button"></span>
+		  </a>
+		  <a href="edit">
+			  <span id="task-edit-button" class="glyphicon glyphicon-edit admin-task-button"></span>
+		  </a>
+	  {% endif %}
+      <h1>{{ task.name }}</h1>
+	  <h5>({{ score }} points, 
+        {{ lang.task.solution_format % solutions }})</h5>
+      <br/>
+      <p>
+        {% if task.desc %}
+        <b>{{ lang.task.description }}: </b>
+          {{ task.desc|safe }}
+        {% endif %}
+      </p>
+	  {% if task.file %}
+      <p>
+        <b>{{ lang.task.attachment }}: </b>
+        <a href="{{ url_for('static', 
+          filename='files/'+task.file) }}">{{ task.file }}</a>
+      </p>
+	  {% endif %}
+	  <input id="task-id" type="hidden" value="{{ task.id }}" />
+      <input id="flag-input" type="text" class="form-control" 
+	 	{% if task_done %} disabled="disabled" {% endif %}
+        placeholder="{% if task_done %}{{ lang.task.success }}{% 
+        else %}{{ lang.task.placeholder }}{% endif %}">
+      <button {% if task_done %}disabled{% endif %} id="flag-submission" 
+        type="button" class="btn btn-block 
+          {% if task_done %}
+            btn-success
+          {% else %}
+            btn-primary
+          {% endif %}">{{ lang.task.submit }}</button>
+    </div>
+  </div>
+</div>
+<span class="lang" data-success="{{ lang.task.success }}" 
+  data-failure="{{ lang.task.failure }}"></span>
+<script src="{{ url_for('static', filename='js/submit.js') }}" 
+    type='text/javascript'></script>

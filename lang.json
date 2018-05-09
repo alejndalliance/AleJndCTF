@@ -1,0 +1,82 @@
+{
+    "english": {
+        "frame": {
+            "title": "AleCTFd",
+            "toggle": "Toggle navigation",
+            "login": "Sign in",
+            "register": "Register",
+            "logged_in": "Logged in as",
+            "logout": "log out"
+        },
+        "main": {
+            "title": "Welcome to AleCTFd!",
+            "text": "Attack and Defense"
+        },
+        "about": {
+            "title": "About",
+            "news": "News",
+            "news_text": "All pwn server will be up in a minute",
+            "rules": "Rules",
+            "rules_text": "No flag sharing"
+        },
+        "tasks": {
+            "title": "Tasks"
+        },
+        "task": {
+            "description": "Description",
+            "attachment": "Attachment",
+            "submit": "Submit",
+            "success": "Correct flag!",
+            "failure": "Incorrect flag!",
+			"points_format": "%d points",
+            "solution_format": "solved by %d",
+            "no_description": "(none)",
+            "placeholder": "flag{here.is.the.flag}"
+        },
+		"addcat" : {
+			"add_title": "Add a Category",
+			"edit_title": "Edit a Category",
+			"delete_title": "Delete a Category",
+			"delete_desc": "Are you sure you want to delete this category?",
+			"name_label": "Category Name: "
+		},
+		"addtask" : {
+			"add_title": "Add a Task",
+			"edit_title": "Edit a Task",
+			"delete_title": "Delete task",
+			"delete_desc": "Are you sure you want to delete this task?",
+			"cat_label": "Category: ",
+			"name_label": "Task Name: ",
+			"description_label": "Description: ",
+			"flag_label": "Flag: ",
+			"score_label": "Score: "
+		},
+        "scoreboard": {
+            "title": "Scoreboard",
+            "player": "Player",
+            "score": "Score"
+        },
+		"settings": {
+			"title": "Settings",
+			"old_pw": "Current Password:",
+			"new_pw": "New Password:",
+			"email": "Email:"
+		},
+        "error": {
+            "title": "Error",
+            "unknown": "Unknown error",
+            "login_required": "You need to be logged in to see this page",
+            "admin_required": "You need to be an admin to see this page",
+            "invalid_credentials": "Invalid username or password",
+            "invalid_password": "The password you entered does not match your current password",
+            "already_registered": "This user is already registered",
+            "empty_user": "Empty username is not allowed",
+            "task_not_found": "TBD",
+			"form": "Invalid form input",
+			"not_started": "Competition hasn't started yet",
+            "game_over": "Competition has ended",
+            "stop_scoreboard": "Scoreboard has been disabled"
+
+        }
+    }
+}

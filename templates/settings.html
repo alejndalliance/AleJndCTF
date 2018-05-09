@@ -1,0 +1,23 @@
+<div class="landing-page container">
+  <div class="row">
+	  <div class="task-box col-md-6 col-md-offset-3" >
+		  <h1>{{ lang.settings.title }} </h1>
+		  <form method="POST" enctype="multipart/form-data">
+			  <input name="category" type="hidden" value="{{ cat_id }}" />
+
+			  <label>{{ lang.settings.old_pw }}</label>
+			  <input name="old_pw" type="password" required="required" class="form-control" />
+
+			  <label>{{ lang.settings.new_pw }}</label>
+			  <input name="new_pw" type="password" class="form-control" />
+
+			  <label>{{ lang.settings.email }}</label>
+			  <input name="email" type="text" class="form-control" />
+
+			  <input type="submit" class="form-control btn-primary" />
+		  </form>
+	  </div>
+
+    </div>
+  </div>
+</div>
