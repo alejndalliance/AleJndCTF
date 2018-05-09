@@ -1,13 +1,13 @@
 <div class="landing-page container">
   <div class="row">
 	  <div class="task-box col-md-6 col-md-offset-3" >
-      <h1>Attack</h1>
-      <input id="flag-input" type="text" class="form-control" placeholder="{{ lang.task.placeholder }}">
-      <button id="flag-submission" type="button" class="btn btn-block btn-primary">{{ lang.task.submit }}</button>
+          <h1>{{ lang.attack.name_label }}</h1>
+      <input id="attack-input" type="text" class="form-control" placeholder="{{ lang.attack.placeholder }}">
+      <button id="attack-submission" type="button" class="btn btn-block btn-primary">{{ lang.task.submit }}</button>
     </div>
   </div>
 </div>
-<span class="lang" data-success="{{ lang.task.success }}"
-  data-failure="{{ lang.task.failure }}"></span>
+<span class="lang" data-success="{{ lang.attack.success }}"
+  data-failure="{{ lang.attack.failure }}"></span>
 <script src="{{ url_for('static', filename='js/submit.js') }}"
     type='text/javascript'></script>

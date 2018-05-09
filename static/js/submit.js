@@ -19,3 +19,20 @@ $("#flag-submission").click(function() {
         }
     });
 });
+
+$("#attack-submission").click(function() {
+    var flag = $("#attack-input").val();
+
+    $.ajax({
+        url: "/attack/submit/" + btoa(flag)
+    }).done(function(data) {
+
+        console.log(data);
+
+        if (data["success"]) {
+            $("#attack-input").val($(".lang").data("success"));
+        } else {
+            $("#attack-input").val($(".lang").data("failure"));
+        }
+    });
+});

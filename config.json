@@ -4,14 +4,14 @@
     "host": "0.0.0.0",
     "port": 8888,
 
-    "isJeopardy": false,
+    "attack_enabled": true,
 	"isProxied": false,
     "csrf_enabled": false,
     "username_regex": "^[a-zA-Z0-9-_. &']+$",
 
 	"startTime": "5-9-18 8:00AM",
-    "stopTime": "5-9-18 10:39PM",
-    "stopScoreboard": "5-9-18 4:13PM",
+    "stopTime": "5-10-18 10:39PM",
+    "stopScoreboard": "5-10-18 4:13PM",
 
     "db": "sqlite:///ctf.db?check_same_thread=False",
 

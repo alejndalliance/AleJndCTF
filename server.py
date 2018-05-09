@@ -10,6 +10,7 @@ import os
 import re
 import dateutil.parser
 import bleach
+import logging
 
 from base64 import b64decode
 from functools import wraps
@@ -53,6 +54,13 @@ if config['isProxied']:
 
 username_regex = re.compile(config['username_regex'])
 
+logger = logging.getLogger('AleJndCTF')
+fh = logging.FileHandler('gameplay.log')
+logger.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(message)s')
+fh.setFormatter(formatter)
+logger.addHandler(fh)
+
 app.secret_key = config['secret_key']
 
 # Rip off from https://github.com/internetwache/tinyctf-platform
@@ -66,13 +74,20 @@ def is_valid_username(u):
 def before_end(f):
     """Ensures that actions can only be done before the CTF is over"""
 
-    # TODO: Fix redirect message
     @wraps(f)
     def decorated_function(*args, **kwargs):
         user = get_user()
+        userCount = db['users'].count()
         cur_time = datetime.datetime.now()
         config['stopTime'] = dateutil.parser.parse(str(config['stopTime']))
-        if cur_time >= config['stopTime'] and user['isAdmin'] == False:
+
+        try:
+            if user['isAdmin']:
+                return f(*args, **kwargs)
+        except:
+            pass
+
+        if cur_time >= config['stopTime'] and userCount != 0:
             return redirect('/error/game_over')
         return f(*args, **kwargs)
     return decorated_function
@@ -83,9 +98,17 @@ def after_start(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         user = get_user()
+        userCount = db['users'].count()
         cur_time = datetime.datetime.now()
         config['startTime'] = dateutil.parser.parse(str(config['stopTime']))
-        if cur_time < config['startTime'] and user['isAdmin'] == False:
+
+        try:
+            if user['isAdmin']:
+                return f(*args, **kwargs)
+        except:
+            pass
+
+        if cur_time < config['startTime'] and userCount != 0:
             return redirect('/error/not_started')
         return f(*args, **kwargs)
     return decorated_function
@@ -134,7 +157,7 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'user_id' not in session:
-            return redirect('/error/not_started')
+            return redirect('/error/login_required')
         return f(*args, **kwargs)
     return decorated_function
 
@@ -144,10 +167,10 @@ def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'user_id' not in session:
-            return redirect(url_for('error', msg='login_required'))
+            return redirect('/error/login_required')
         user = get_user()
         if user["isAdmin"] == False:
-            return redirect(url_for('error', msg='admin_required'))
+            return redirect('/error/admin_required')
         return f(*args, **kwargs)
     return decorated_function
 
@@ -160,6 +183,14 @@ def get_user():
 
     return None
 
+def get_user_pwned(target_id):
+    """Looks up the pwned user info in the database"""
+
+    if target_id:
+        return db['users'].find_one(id=target_id)
+
+    return None
+
 def get_task(tid):
     """Finds a task with a given category and score"""
 
@@ -168,13 +199,13 @@ def get_task(tid):
 
     return task.next()
 
-def get_pwn_flags():
-    """Returns the pwn flags of the current user"""
+def get_service_flag(flag):
+    """Returns the service id for the flag of the target user"""
 
-    pwn_flags = db.query('''select pf.service_id from pwn_flags pf
-            where pf.user_id = :user_id''',
-            user_id=session['user_id'])
-    return [pf['service_id'] for pf in list(pwn_flags)]
+    if flag:
+        return db['services'].find_one(flag=flag)
+
+    return None
 
 def get_flags():
     """Returns the flags of the current user"""
@@ -195,6 +226,20 @@ def get_total_completion_count():
 
     return res
 
+def check_user_target(target_id, service_id):
+    """Check if user already attacked the target"""
+
+    if target_id:
+        pwns = db.query('''select count(*) c from pwn p
+                where p.target_id = :target_id and p.service_id = :service_id
+                and p.user_id = :user_id''',
+                user_id=session['user_id'], target_id=target_id, service_id=service_id)
+
+        for p in pwns:
+            return p['c']
+
+    return None
+
 @app.route('/error/<msg>')
 def error(msg):
     """Displays an error message"""
@@ -206,9 +251,8 @@ def error(msg):
 
     user = get_user()
 
-    # TODO: Fix
     render = render_template('frame.html', lang=lang, page='error.html',
-        message=message, user=user)
+        message=message, user=user, attack=config['attack_enabled'])
     return make_response(render)
 
 # TODO: Initializes with something else
@@ -256,7 +300,7 @@ def register():
 
     # Render template
     render = render_template('frame.html', lang=lang,
-        page='register.html', login=False)
+        page='register.html', login=False, attack=config['attack_enabled'])
     return make_response(render)
 
 @app.route('/register/submit', methods = ['POST'])
@@ -302,23 +346,52 @@ def register_submit():
 
     return redirect('/tasks')
 
-
-
 @app.route('/attack')
 @login_required
 @before_end
 def attack():
+    """Displays the attack form"""
+
+    user = get_user()
+
+    render = render_template('frame.html', lang=lang, page='attack.html',
+            user=user, attack=config['attack_enabled'])
+    return make_response(render)
+
+@app.route('/attack/submit/<flag>')
+@login_required
+@before_end
+def attacksubmit(flag):
     """Handles the submission of flags for Attack and Defense style"""
 
     user = get_user()
-    userCount = db['users'].count(isHidden=0)
-    isAdmin = user['isAdmin']
 
-    flags = get_pwn_flags()
+    flag = b64decode(flag)
+    service = get_service_flag(flag)
+    print service['user_id']
+    target = get_user_pwned(service['user_id'])
+    print target['id']
+    pwned = check_user_target(target['id'], service['id'])
 
-    render = render_template('frame.html', lang=lang, page='attack.html',
-        user=user)
-    return make_response(render)
+    result = {'success': False}
+    if service and not pwned:
+
+        timestamp = int(time.time() * 1000)
+        ip = request.remote_addr
+        logger.info("{}({}) has successfully attacked {} for {} points!".format(user['username'], ip, target['username'], service['score']))
+
+        # Insert flag
+        new_attack = dict(service_id=service['id'], user_id=session['user_id'],
+                score=service['score'], target_id=target['id'], timestamp=timestamp, ip=ip)
+        db['pwn'].insert(new_attack)
+
+        # Insert deduct pts
+        new_deduct = dict(user_id=target['id'], deduct=service['score'], timestamp=timestamp)
+        db['pwn_deduct'].insert(new_deduct)
+
+        result['success'] = True
+
+    return jsonify(result)
 
 @app.route('/tasks')
 @login_required
@@ -369,14 +442,14 @@ def tasks():
 
     # Render template
     render = render_template('frame.html', lang=lang, page='tasks.html',
-        user=user, categories=categories, grid=grid)
+        user=user, categories=categories, grid=grid, attack=config['attack_enabled'])
     return make_response(render)
 
 @app.route('/addcat/', methods=['GET'])
 @admin_required
 def addcat():
     user = get_user()
-    render = render_template('frame.html', lang=lang, user=user, page='addcat.html')
+    render = render_template('frame.html', lang=lang, user=user, page='addcat.html', attack=config['attack_enabled'])
     return make_response(render)
 
 @app.route('/addcat/', methods=['POST'])
@@ -396,7 +469,7 @@ def addcatsubmit():
 def editcat(id):
     user = get_user()
     category = db['categories'].find_one(id=id)
-    render = render_template('frame.html', lang=lang, user=user, category=category, page='editcat.html')
+    render = render_template('frame.html', lang=lang, user=user, category=category, page='editcat.html', attack=config['attack_enabled'])
     return make_response(render)
 
 @app.route('/editcat/<catId>/', methods=['POST'])
@@ -417,7 +490,7 @@ def deletecat(catId):
     category = db['categories'].find_one(id=catId)
 
     user = get_user()
-    render = render_template('frame.html', lang=lang, user=user, page='deletecat.html', category=category)
+    render = render_template('frame.html', lang=lang, user=user, page='deletecat.html', category=category, attack=config['attack_enabled'])
     return make_response(render)
 
 @app.route('/editcat/<catId>/delete', methods=['POST'])
@@ -434,7 +507,7 @@ def addtask(cat):
     user = get_user()
 
     render = render_template('frame.html', lang=lang, user=user,
-            cat_name=category['name'], cat_id=category['id'], page='addtask.html')
+            cat_name=category['name'], cat_id=category['id'], page='addtask.html', attack=config['attack_enabled'])
     return make_response(render)
 
 @app.route('/addtask/<cat>/', methods=['POST'])
@@ -486,7 +559,7 @@ def edittask(tid):
 
     render = render_template('frame.html', lang=lang, user=user,
             cat_name=category['name'], cat_id=category['id'],
-            page='edittask.html', task=task)
+            page='edittask.html', task=task, attack=config['attack_enabled'])
     return make_response(render)
 
 @app.route('/tasks/<tid>/edit', methods=['POST'])
@@ -544,7 +617,7 @@ def deletetask(tid):
     task = tasks.find_one(id=tid)
 
     user = get_user()
-    render = render_template('frame.html', lang=lang, user=user, page='deletetask.html', task=task)
+    render = render_template('frame.html', lang=lang, user=user, page='deletetask.html', task=task, attack=config['attack_enabled'])
     return make_response(render)
 
 @app.route('/tasks/<tid>/delete', methods=['POST'])
@@ -574,7 +647,7 @@ def task(tid):
     # Render template
     render = render_template('frame.html', lang=lang, page='task.html',
         task_done=task_done, login=login, solutions=solutions,
-        user=user, category=task["cat_name"], task=task, score=task["score"])
+        user=user, category=task["cat_name"], task=task, score=task["score"], attack=config['attack_enabled'])
     return make_response(render)
 
 @app.route('/submit/<tid>/<flag>')
@@ -594,7 +667,7 @@ def submit(tid, flag):
 
         timestamp = int(time.time() * 1000)
         ip = request.remote_addr
-        print "flag submitter ip: {}".format(ip)
+        logger.info("{}({}) has successfully solved {} for {} points!".format(user['username'], ip, task['name'], task['score']))
 
         # Insert flag
         new_flag = dict(task_id=task['id'], user_id=session['user_id'],
@@ -611,26 +684,32 @@ def submit(tid, flag):
 def scoreboard():
     """Displays the scoreboard"""
 
+    # TODO: Last submit is the total timestamp from attack and jeopardy, fix this
     user = get_user()
-    scores = db.query('''select u.username, ifnull(sum(f.score), 0) as score,
-        max(timestamp) as last_submit from users u left join flags f
-        on u.id = f.user_id where u.isHidden = 0 group by u.username
-        order by score desc, last_submit asc''')
+    scores = db.query('''select u.username, max(ifnull(sum(ifnull(f.score, 0))+sum(ifnull(p.score, 0))-sum(ifnull(pd.deduct, 0)), 0), 0) as score,
+            max(f.timestamp+p.timestamp+pd.timestamp) as last_submit from users u left join flags f
+            on u.id = f.user_id left join pwn p on u.id = p.user_id left join pwn_deduct pd on u.id = pd.user_id where
+            u.isHidden = 0 group by u.username order by score desc, last_submit asc''')
+
+    # scores = db.query('''select u.username, ifnull(sum(f.score), 0) as score,
+    #     max(timestamp) as last_submit from users u left join flags f
+    #     on u.id = f.user_id where u.isHidden = 0 group by u.username
+    #     order by score desc, last_submit asc''')
 
     scores = list(scores)
 
     # Render template
     render = render_template('frame.html', lang=lang, page='scoreboard.html',
-        user=user, scores=scores)
+        user=user, scores=scores, attack=config['attack_enabled'])
     return make_response(render)
 
 @app.route('/scoreboard.json')
 @stop_scoreboard
 def scoreboard_json():
-    scores = db.query('''select u.username, ifnull(sum(f.score), 0) as score,
-        max(timestamp) as last_submit from users u left join flags f
-        on u.id = f.user_id where u.isHidden = 0 group by u.username
-        order by score desc, last_submit asc''')
+    scores = db.query('''select u.username, max(ifnull(sum(ifnull(f.score, 0))+sum(ifnull(p.score, 0))-sum(ifnull(pd.deduct, 0)), 0), 0) as score,
+            max(f.timestamp+p.timestamp+pd.timestamp) as last_submit from users u left join flags f
+            on u.id = f.user_id left join pwn p on u.id = p.user_id left join pwn_deduct pd on u.id = pd.user_id where
+            u.isHidden = 0 group by u.username order by score desc, last_submit asc''')
 
     scores = list(scores)
 
@@ -645,7 +724,7 @@ def about():
 
     # Render template
     render = render_template('frame.html', lang=lang, page='about.html',
-        user=user)
+        user=user, attack=config['attack_enabled'])
     return make_response(render)
 
 @app.route('/settings')
@@ -653,7 +732,7 @@ def about():
 def settings():
     user = get_user()
     render = render_template('frame.html', lang=lang, page='settings.html',
-        user=user)
+        user=user, attack=config['attack_enabled'])
     return make_response(render)
 
 @app.route('/settings', methods = ['POST'])
@@ -697,7 +776,7 @@ def index():
 
     # Render template
     render = render_template('frame.html', lang=lang,
-        page='main.html', user=user)
+        page='main.html', user=user, attack=config['attack_enabled'])
     return make_response(render)
 
 if __name__ == '__main__':

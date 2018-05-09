@@ -76,7 +76,13 @@
 			"not_started": "Competition hasn't started yet",
             "game_over": "Competition has ended",
             "stop_scoreboard": "Scoreboard has been disabled"
-
+        },
+        "attack": {
+            "title": "Attack",
+            "name_label": "Target",
+            "success": "Attack succeed!",
+            "failure": "Attack failed!",
+            "placeholder": "flag{here.is.the.flag}"
         }
     }
 }
