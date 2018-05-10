@@ -18,6 +18,8 @@ $ ./buildTables.sh
 $ python server.py
 ```
 
+For Attack and Defense mode. Please refer [here](https://github.com/alejndalliance/AleJndFlag).
+
 #### TODO
 
 ```bash
