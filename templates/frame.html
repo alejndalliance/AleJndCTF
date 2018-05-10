@@ -45,7 +45,7 @@
               <ul class="nav navbar-nav">
                 <li><a href="/about">{{ lang.about.title }}</a></li>
                 <li><a href="/tasks">{{ lang.tasks.title }}</a></li>
-                <{% if attack %}<li><a href="/attack">{{ lang.attack.title }}</a></li>{% endif %}
+                {% if attack %}<li><a href="/attack">{{ lang.attack.title }}</a></li>{% endif %}
                 <li><a href="/scoreboard">{{ lang.scoreboard.title }}</a></li>
                 <li><a href="/settings">{{ lang.settings.title }}</a></li>
               </ul>

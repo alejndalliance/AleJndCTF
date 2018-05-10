@@ -354,6 +354,9 @@ def attack():
 
     user = get_user()
 
+    if not config['attack_enabled']:
+        return redirect('/tasks')
+
     render = render_template('frame.html', lang=lang, page='attack.html',
             user=user, attack=config['attack_enabled'])
     return make_response(render)
@@ -365,6 +368,9 @@ def attacksubmit(flag):
     """Handles the submission of flags for Attack and Defense style"""
 
     user = get_user()
+
+    if not config['attack_enabled']:
+        return redirect('/tasks')
 
     flag = b64decode(flag)
     service = get_service_flag(flag)
