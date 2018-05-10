@@ -55,9 +55,9 @@ if config['isProxied']:
 username_regex = re.compile(config['username_regex'])
 
 logger = logging.getLogger('AleJndCTF')
-fh = logging.FileHandler('gameplay.log')
+fh = logging.FileHandler(config['log_file'])
 logger.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s - %(message)s')
+formatter = logging.Formatter('%(asctime)s - %(message)s', "%Y-%m-%d %H:%M:%S")
 fh.setFormatter(formatter)
 logger.addHandler(fh)
 
@@ -268,6 +268,16 @@ def _set_sqlite_pragma(dbapi_connection, connection_record):
         cursor = dbapi_connection.cursor()
         cursor.execute("PRAGMA foreign_keys=ON;")
         cursor.close()
+
+@app.route('/logs')
+def logs():
+    """Display the gameplay.log file content"""
+
+    buf = open(config['log_file'], 'r').read()
+
+    render = render_template('frame.html', lang=lang, page='logs.html',
+            log=buf.replace('\n', '<br>'))
+    return make_response(render)
 
 @app.route('/login', methods = ['POST'])
 def login():

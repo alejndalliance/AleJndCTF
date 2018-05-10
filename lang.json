@@ -83,6 +83,10 @@
             "success": "Attack succeed!",
             "failure": "Attack failed!",
             "placeholder": "flag{here.is.the.flag}"
+        },
+        "log": {
+            "title": "Logs",
+            "name_label": "Logs"
         }
     }
 }

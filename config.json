@@ -17,6 +17,7 @@
 
     "language_file": "lang.json",
     "language": "english",
+    "log_file": "gameplay.log",
 
     "debug": true
 }
