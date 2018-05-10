@@ -30,8 +30,10 @@ from flask import session
 from flask import url_for
 from flask import Response
 from flask import abort
+from flask_sslify import SSLify
 
 app = Flask(__name__, static_folder='static', static_url_path='')
+sslify = SSLify(app, permanent=True, subdomains=True)
 
 db = None
 lang = None
@@ -144,9 +146,17 @@ def stop_scoreboard(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         user = get_user()
+        userCount = db['users'].count()
         cur_time = datetime.datetime.now()
         config['stopScoreboard'] = dateutil.parser.parse(str(config['stopScoreboard']))
-        if cur_time >= config['stopScoreboard'] and user['isAdmin'] == False:
+
+        try:
+            if user['isAdmin']:
+                return f(*args, **kwargs)
+        except:
+            pass
+
+        if cur_time >= config['stopScoreboard'] and userCount != 0:
             return redirect('/error/stop_scoreboard')
         return f(*args, **kwargs)
     return decorated_function
@@ -268,6 +278,15 @@ def _set_sqlite_pragma(dbapi_connection, connection_record):
         cursor = dbapi_connection.cursor()
         cursor.execute("PRAGMA foreign_keys=ON;")
         cursor.close()
+
+@app.route('/flag/submit/<src_ip>/<local_ip>')
+def flagsubmit(src_ip, local_ip):
+    """Handles the flag request from the vulnbox"""
+
+    result = {"success": false}
+    # TODO: Implement me!
+
+    return jsonify(result)
 
 @app.route('/logs')
 def logs():
