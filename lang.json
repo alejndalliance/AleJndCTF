@@ -1,7 +1,7 @@
 {
     "english": {
         "frame": {
-            "title": "AleCTFd",
+            "title": "AleJndCTF",
             "toggle": "Toggle navigation",
             "login": "Sign in",
             "register": "Register",
@@ -9,7 +9,7 @@
             "logout": "log out"
         },
         "main": {
-            "title": "Welcome to AleCTFd!",
+            "title": "Welcome to AleJndCTF!",
             "text": "Attack and Defense"
         },
         "about": {
