@@ -1,6 +1,11 @@
 #!/bin/bash
 
-mkdir static/files
+STORAGE=static/files
+
+if [ ! -d  $STORAGE ]; then
+    echo 'Creating storage directory.'
+    mkdir static/files
+fi
 
 sqlite3 ctf.db 'CREATE TABLE categories ( id INTEGER PRIMARY KEY, name TEXT )'
 
@@ -15,3 +20,5 @@ sqlite3 ctf.db 'CREATE TABLE flags (task_id INTEGER, user_id INTEGER, score INTE
 sqlite3 ctf.db 'CREATE TABLE services (id INTEGER, user_id INTEGER, flag TEXT, score INTEGER, timestamp BIGINT, ip TEXT, PRIMARY KEY (id, user_id), FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE)'
 sqlite3 ctf.db 'CREATE TABLE pwn (service_id INTEGER, user_id INTEGER, target_id INTEGER, score INTEGER, timestamp BIGINT, ip TEXT, PRIMARY KEY (service_id, user_id, target_id))'
 sqlite3 ctf.db 'CREATE TABLE pwn_deduct (user_id INTEGER, deduct INTEGER, timestamp BIGINT, PRIMARY KEY (user_id), FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE)'
+
+echo 'Done creating tables.'
