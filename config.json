@@ -5,11 +5,11 @@
     "port": 8888,
 
     "attack_enabled": true,
-	"isProxied": false,
+    "isProxied": false,
     "csrf_enabled": false,
     "username_regex": "^[a-zA-Z0-9-_. &']+$",
 
-	"startTime": "5-9-18 8:00AM",
+    "startTime": "5-9-18 8:00AM",
     "stopTime": "5-11-18 10:39PM",
     "stopScoreboard": "5-11-18 4:13PM",
 

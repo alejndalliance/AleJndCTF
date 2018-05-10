@@ -292,12 +292,6 @@ def _set_sqlite_pragma(dbapi_connection, connection_record):
 def flagsubmit(uid, local_ip, score):
     """Handles the flag request from the vulnbox"""
 
-    user = get_user()
-
-    print 'uid: ' + uid
-    print 'local_ip: ' + local_ip
-    print 'score: ' + score
-
     if not config['attack_enabled']:
         return 'what are you doing here. go away!'
 
@@ -421,9 +415,7 @@ def attacksubmit(flag):
 
     flag = b64decode(flag)
     service = get_service_flag(flag)
-    print service['user_id']
     target = get_user_pwned(service['user_id'])
-    print target['id']
     pwned = check_user_target(target['id'], service['id'])
 
     result = {'success': False}
