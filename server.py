@@ -209,6 +209,15 @@ def get_task(tid):
 
     return task.next()
 
+# TODO: Should be get_service_info(uid, local_ip, score) which returns the flag
+def get_service_flag_info(uid, local_ip, score):
+    """Returns the flag for the uid, local_ip, and score of the entrypoints for the target user"""
+
+    if uid and local_ip and score:
+        return db['services'].find_one(uid=uid, ip=local_ip, score=score)
+
+    return None
+
 def get_service_flag(flag):
     """Returns the service id for the flag of the target user"""
 
@@ -279,14 +288,23 @@ def _set_sqlite_pragma(dbapi_connection, connection_record):
         cursor.execute("PRAGMA foreign_keys=ON;")
         cursor.close()
 
-@app.route('/flag/submit/<src_ip>/<local_ip>')
-def flagsubmit(src_ip, local_ip):
+@app.route('/flag/submit/<uid>/<local_ip>/<score>')
+def flagsubmit(uid, local_ip, score):
     """Handles the flag request from the vulnbox"""
 
-    result = {"success": false}
-    # TODO: Implement me!
+    user = get_user()
 
-    return jsonify(result)
+    print 'uid: ' + uid
+    print 'local_ip: ' + local_ip
+    print 'score: ' + score
+
+    if not config['attack_enabled']:
+        return 'what are you doing here. go away!'
+
+    # TODO: Must encrypt the GET data
+    service = get_service_flag_info(uid, local_ip, score)
+
+    return service['flag']
 
 @app.route('/logs')
 def logs():
