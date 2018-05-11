@@ -306,8 +306,8 @@ def logs():
 
     buf = open(config['log_file'], 'r').read()
 
-    render = render_template('frame.html', lang=lang, page='logs.html',
-            log=buf.replace('\n', '<br>'))
+    render = render_template('public_frame.html', lang=lang, page='logs.html',
+            allow_public=config['public_enabled'], log=buf.replace('\n', '<br>'))
     return make_response(render)
 
 @app.route('/login', methods = ['POST'])
@@ -746,6 +746,28 @@ def scoreboard():
     # Render template
     render = render_template('frame.html', lang=lang, page='scoreboard.html',
         user=user, scores=scores, attack=config['attack_enabled'])
+    return make_response(render)
+
+@app.route('/scoreboard/public')
+@stop_scoreboard
+def scoreboard_public():
+    """Displays the scoreboard for public"""
+
+    if not config['public_enabled']:
+        return redirect('/')
+
+    # TODO: Last submit is the total timestamp from attack and jeopardy, fix this
+    user = get_user()
+    scores = db.query('''select u.username, max(ifnull(sum(ifnull(f.score, 0))+sum(ifnull(p.score, 0))-sum(ifnull(pd.deduct, 0)), 0), 0) as score,
+            max(f.timestamp+p.timestamp+pd.timestamp) as last_submit from users u left join flags f
+            on u.id = f.user_id left join pwn p on u.id = p.user_id left join pwn_deduct pd on u.id = pd.user_id where
+            u.isHidden = 0 group by u.username order by score desc, last_submit asc''')
+
+    scores = list(scores)
+
+    # Render template
+    render = render_template('public_frame.html', lang=lang, page='scoreboard.html',
+            user=user, scores=scores, allow_public=config['public_enabled'])
     return make_response(render)
 
 @app.route('/scoreboard.json')
