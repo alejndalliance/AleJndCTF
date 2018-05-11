@@ -288,12 +288,14 @@ def _set_sqlite_pragma(dbapi_connection, connection_record):
         cursor.execute("PRAGMA foreign_keys=ON;")
         cursor.close()
 
-@app.route('/flag/submit/<uid>/<local_ip>/<score>')
-def flagsubmit(uid, local_ip, score):
+@app.route('/flag/submit/<uid>/<score>')
+def flagsubmit(uid, score):
     """Handles the flag request from the vulnbox"""
 
     if not config['attack_enabled']:
         return 'what are you doing here. go away!'
+
+    local_ip = request.remote_addr
 
     # TODO: Must encrypt the GET data
     service = get_service_flag_info(uid, local_ip, score)
