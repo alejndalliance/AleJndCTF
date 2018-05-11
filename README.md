@@ -17,6 +17,9 @@ $ pip install -r requirements.txt
 $ ./buildTables.sh
 $ python server.py
 ```
+### Docs
+
+Simple documentations at [wiki](https://github.com/alejndalliance/AleJndCTF/wiki)
 
 For Attack and Defense mode. Please refer [here](https://github.com/alejndalliance/AleJndFlag).
 
