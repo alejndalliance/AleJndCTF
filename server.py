@@ -102,7 +102,7 @@ def after_start(f):
         user = get_user()
         userCount = db['users'].count()
         cur_time = datetime.datetime.now()
-        config['startTime'] = dateutil.parser.parse(str(config['stopTime']))
+        config['startTime'] = dateutil.parser.parse(str(config['startTime']))
 
         try:
             if user['isAdmin']:
