@@ -254,7 +254,8 @@ def error(msg):
     user = get_user()
 
     render = render_template('frame.html', lang=lang, page='error.html',
-        message=message, user=user, attack=config['attack_enabled'])
+        message=message, user=user, attack=config['attack_enabled'],
+        allow_register=config['registration_enabled'])
     return make_response(render)
 
 # TODO: Initializes with something else
@@ -307,7 +308,8 @@ def register():
 
     # Render template
     render = render_template('frame.html', lang=lang,
-        page='register.html', login=False, attack=config['attack_enabled'])
+        page='register.html', login=False, attack=config['attack_enabled'],
+        allow_register=config['registration_enabled'])
     return make_response(render)
 
 @app.route('/register/submit', methods = ['POST'])
@@ -364,7 +366,7 @@ def attack():
         return redirect('/tasks')
 
     render = render_template('frame.html', lang=lang, page='attack.html',
-            user=user, attack=config['attack_enabled'])
+            user=user, attack=config['attack_enabled'], allow_register=config['registration_enabled'])
     return make_response(render)
 
 @app.route('/attack/submit/<flag>')
@@ -461,14 +463,16 @@ def tasks():
 
     # Render template
     render = render_template('frame.html', lang=lang, page='tasks.html',
-        user=user, categories=categories, grid=grid, attack=config['attack_enabled'])
+        user=user, categories=categories, grid=grid, attack=config['attack_enabled'],
+        allow_register=config['registration_enabled'])
     return make_response(render)
 
 @app.route('/addcat/', methods=['GET'])
 @admin_required
 def addcat():
     user = get_user()
-    render = render_template('frame.html', lang=lang, user=user, page='addcat.html', attack=config['attack_enabled'])
+    render = render_template('frame.html', lang=lang, user=user, page='addcat.html', attack=config['attack_enabled'],
+            allow_register=config['registration_enabled'])
     return make_response(render)
 
 @app.route('/addcat/', methods=['POST'])
@@ -488,7 +492,8 @@ def addcatsubmit():
 def editcat(id):
     user = get_user()
     category = db['categories'].find_one(id=id)
-    render = render_template('frame.html', lang=lang, user=user, category=category, page='editcat.html', attack=config['attack_enabled'])
+    render = render_template('frame.html', lang=lang, user=user, category=category, page='editcat.html', attack=config['attack_enabled'],
+            allow_register=config['registration_enabled'])
     return make_response(render)
 
 @app.route('/editcat/<catId>/', methods=['POST'])
@@ -509,7 +514,8 @@ def deletecat(catId):
     category = db['categories'].find_one(id=catId)
 
     user = get_user()
-    render = render_template('frame.html', lang=lang, user=user, page='deletecat.html', category=category, attack=config['attack_enabled'])
+    render = render_template('frame.html', lang=lang, user=user, page='deletecat.html', category=category, attack=config['attack_enabled'],
+            allow_register=config['registration_enabled'])
     return make_response(render)
 
 @app.route('/editcat/<catId>/delete', methods=['POST'])
@@ -526,7 +532,8 @@ def addtask(cat):
     user = get_user()
 
     render = render_template('frame.html', lang=lang, user=user,
-            cat_name=category['name'], cat_id=category['id'], page='addtask.html', attack=config['attack_enabled'])
+            cat_name=category['name'], cat_id=category['id'], page='addtask.html', attack=config['attack_enabled'],
+            allow_register=config['registration_enabled'])
     return make_response(render)
 
 @app.route('/addtask/<cat>/', methods=['POST'])
@@ -578,7 +585,8 @@ def edittask(tid):
 
     render = render_template('frame.html', lang=lang, user=user,
             cat_name=category['name'], cat_id=category['id'],
-            page='edittask.html', task=task, attack=config['attack_enabled'])
+            page='edittask.html', task=task, attack=config['attack_enabled'],
+            allow_register=config['registration_enabled'])
     return make_response(render)
 
 @app.route('/tasks/<tid>/edit', methods=['POST'])
@@ -636,7 +644,8 @@ def deletetask(tid):
     task = tasks.find_one(id=tid)
 
     user = get_user()
-    render = render_template('frame.html', lang=lang, user=user, page='deletetask.html', task=task, attack=config['attack_enabled'])
+    render = render_template('frame.html', lang=lang, user=user, page='deletetask.html', task=task, attack=config['attack_enabled'],
+            allow_register=config['registration_enabled'])
     return make_response(render)
 
 @app.route('/tasks/<tid>/delete', methods=['POST'])
@@ -666,7 +675,8 @@ def task(tid):
     # Render template
     render = render_template('frame.html', lang=lang, page='task.html',
         task_done=task_done, login=login, solutions=solutions,
-        user=user, category=task["cat_name"], task=task, score=task["score"], attack=config['attack_enabled'])
+        user=user, category=task["cat_name"], task=task, score=task["score"], attack=config['attack_enabled'],
+        allow_register=config['registration_enabled'])
     return make_response(render)
 
 @app.route('/submit/<tid>/<flag>')
@@ -765,7 +775,7 @@ def about():
 
     # Render template
     render = render_template('frame.html', lang=lang, page='about.html',
-        user=user, attack=config['attack_enabled'])
+        user=user, attack=config['attack_enabled'], allow_register=config['registration_enabled'])
     return make_response(render)
 
 @app.route('/settings')
@@ -773,7 +783,7 @@ def about():
 def settings():
     user = get_user()
     render = render_template('frame.html', lang=lang, page='settings.html',
-        user=user, attack=config['attack_enabled'])
+        user=user, attack=config['attack_enabled'], allow_register=config['registration_enabled'])
     return make_response(render)
 
 @app.route('/settings', methods = ['POST'])
@@ -817,7 +827,8 @@ def index():
 
     # Render template
     render = render_template('frame.html', lang=lang,
-        page='main.html', user=user, attack=config['attack_enabled'])
+        page='main.html', user=user, attack=config['attack_enabled'],
+        allow_register=config['registration_enabled'])
     return make_response(render)
 
 if __name__ == '__main__':

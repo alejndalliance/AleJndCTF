@@ -37,7 +37,7 @@
                   <input type="password" placeholder="Password" class="form-control" name="password">
                 </div>
                 <button formaction="/login" type="submit" class="btn btn-success">{{ lang.frame.login }}</button>
-                <a href="/register"><button type="button" class="btn btn-success">{{ lang.frame.register }}</button></a>
+                {% if allow_register %}<a href="/register"><button type="button" class="btn btn-success">{{ lang.frame.register }}</button></a>{% endif %}
               </form>
             </div>
             {% else %}
