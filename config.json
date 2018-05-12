@@ -1,5 +1,6 @@
 {
     "secret_key": "PLEASE_CHANGE_ME",
+    "attack_key": "c3bb356d542b36ca5a352cd3a6276014",
 
     "host": "0.0.0.0",
     "port": 8888,
@@ -10,9 +11,10 @@
     "csrf_enabled": false,
     "username_regex": "^[a-zA-Z0-9-_. &']+$",
 
+    "attack_score": "100",
     "startTime": "5-9-18 8:00AM",
-    "stopTime": "5-11-18 10:39PM",
-    "stopScoreboard": "5-11-18 4:13PM",
+    "stopTime": "5-12-18 10:39PM",
+    "stopScoreboard": "5-12-18 10:00PM",
 
     "db": "sqlite:///ctf.db?check_same_thread=False",
 

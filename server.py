@@ -14,6 +14,7 @@ import logging
 
 from base64 import b64decode
 from functools import wraps
+from Crypto.Cipher import AES
 
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
@@ -193,11 +194,11 @@ def get_user():
 
     return None
 
-def get_user_pwned(target_id):
+def get_user_pwned(target_ip):
     """Looks up the pwned user info in the database"""
 
-    if target_id:
-        return db['users'].find_one(id=target_id)
+    if target_ip:
+        return db['users'].find_one(ip=target_ip)
 
     return None
 
@@ -208,23 +209,6 @@ def get_task(tid):
             tid=tid)
 
     return task.next()
-
-# TODO: Should be get_service_info(uid, local_ip, score) which returns the flag
-def get_service_flag_info(uid, local_ip, score):
-    """Returns the flag for the uid, local_ip, and score of the entrypoints for the target user"""
-
-    if uid and local_ip and score:
-        return db['services'].find_one(uid=uid, ip=local_ip, score=score)
-
-    return None
-
-def get_service_flag(flag):
-    """Returns the service id for the flag of the target user"""
-
-    if flag:
-        return db['services'].find_one(flag=flag)
-
-    return None
 
 def get_flags():
     """Returns the flags of the current user"""
@@ -245,14 +229,13 @@ def get_total_completion_count():
 
     return res
 
-def check_user_target(target_id, service_id):
+def check_user_target(target_id, user_id):
     """Check if user already attacked the target"""
 
     if target_id:
         pwns = db.query('''select count(*) c from pwn p
-                where p.target_id = :target_id and p.service_id = :service_id
-                and p.user_id = :user_id''',
-                user_id=session['user_id'], target_id=target_id, service_id=service_id)
+                where p.target_id = :target_id and p.user_id = :user_id''',
+                user_id=session['user_id'], target_id=target_id)
 
         for p in pwns:
             return p['c']
@@ -288,20 +271,6 @@ def _set_sqlite_pragma(dbapi_connection, connection_record):
         cursor.execute("PRAGMA foreign_keys=ON;")
         cursor.close()
 
-@app.route('/flag/submit/<uid>')
-def flagsubmit(uid):
-    """Handles the flag request from the vulnbox"""
-
-    if not config['attack_enabled']:
-        return 'what are you doing here. go away!'
-
-    local_ip = request.remote_addr
-
-    # TODO: Must encrypt the GET data
-    service = get_service_flag_info(uid, local_ip)
-
-    return service['flag']
-
 @app.route('/logs')
 def logs():
     """Display the gameplay.log file content"""
@@ -336,11 +305,6 @@ def login():
 def register():
     """Displays the register form"""
 
-    # NOTE: Already wrapped this as a function
-    # userCount = db['users'].count()
-    # if datetime.datetime.today() < config['startTime'] and userCount != 0:
-    #     return redirect('/error/not_started')
-
     # Render template
     render = render_template('frame.html', lang=lang,
         page='register.html', login=False, attack=config['attack_enabled'])
@@ -352,7 +316,6 @@ def register_submit():
 
     from werkzeug.security import generate_password_hash
 
-    # NOTE: Double the protection lol
     username = bleach.clean(request.form['user'], tags=[])
     email = bleach.clean(request.form['email'], tags=[])
     password = bleach.clean(request.form['password'], tags=[])
@@ -415,25 +378,34 @@ def attacksubmit(flag):
     if not config['attack_enabled']:
         return redirect('/tasks')
 
-    flag = b64decode(flag)
-    service = get_service_flag(flag)
-    target = get_user_pwned(service['user_id'])
-    pwned = check_user_target(target['id'], service['id'])
+    flag = b64decode(flag).decode('base64')
+    ctext = flag.split('$')[0]
+    iv = flag.split('$')[1][:-3]
+
+    key = config['attack_key']
+    mode = AES.MODE_CBC
+
+    decryptor = AES.new(key, mode, IV=iv)
+    target_ip = decryptor.decrypt(ctext)
+    target_ip = target_ip[:-2]
+
+    target = get_user_pwned(target_ip)
+    pwned = check_user_target(target['id'], session['user_id'])
 
     result = {'success': False}
-    if service and not pwned:
+    if target_ip and not pwned:
 
         timestamp = int(time.time() * 1000)
         ip = request.remote_addr
-        logger.info("{}({}) has successfully attacked {} for {} points!".format(user['username'], ip, target['username'], service['score']))
+        logger.info("{}({}) has successfully attacked {} for {} points!".format(user['username'], ip, target['username'], config['attack_score']))
 
         # Insert flag
-        new_attack = dict(service_id=service['id'], user_id=session['user_id'],
-                score=service['score'], target_id=target['id'], timestamp=timestamp, ip=ip)
+        new_attack = dict(user_id=session['user_id'],
+                score=config['attack_score'], target_id=target['id'], timestamp=timestamp, ip=ip)
         db['pwn'].insert(new_attack)
 
         # Insert deduct pts
-        new_deduct = dict(user_id=target['id'], deduct=service['score'], timestamp=timestamp)
+        new_deduct = dict(user_id=target['id'], deduct=config['attack_score'], timestamp=timestamp)
         db['pwn_deduct'].insert(new_deduct)
 
         result['success'] = True
