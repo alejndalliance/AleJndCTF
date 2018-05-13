@@ -14,8 +14,8 @@
 
     "attack_score": "100",
     "startTime": "5-9-18 8:00AM",
-    "stopTime": "5-12-18 10:39PM",
-    "stopScoreboard": "5-12-18 10:00PM",
+    "stopTime": "5-13-18 10:39PM",
+    "stopScoreboard": "5-13-18 10:00PM",
 
     "db": "sqlite:///ctf.db?check_same_thread=False",
 

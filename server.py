@@ -377,24 +377,28 @@ def attacksubmit(flag):
 
     user = get_user()
 
+    result = {'success': False}
     if not config['attack_enabled']:
         return redirect('/tasks')
 
     flag = b64decode(flag).decode('base64')
-    ctext = flag.split('$')[0]
-    iv = flag.split('$')[1][:-3]
+    ctext = flag.split('::')[0]
+    iv = flag.split('::')[1]
 
     key = config['attack_key']
     mode = AES.MODE_CBC
 
     decryptor = AES.new(key, mode, IV=iv)
     target_ip = decryptor.decrypt(ctext)
-    target_ip = target_ip[:-2]
+    target_ip = target_ip[:-ord(target_ip[-1])]
 
     target = get_user_pwned(target_ip)
+
+    if not target:
+        return jsonify(result)
+
     pwned = check_user_target(target['id'], session['user_id'])
 
-    result = {'success': False}
     if target_ip and not pwned:
 
         timestamp = int(time.time() * 1000)
