@@ -210,6 +210,15 @@ def get_task(tid):
 
     return task.next()
 
+def get_service_flag_info(uid, local_ip):
+    """Returns the flag for the uid and local_ip of the entrypoints for the target user"""
+
+    if uid and local_ip:
+        return db['services'].find_one(uid=uid, ip=local_ip)
+
+    return None
+
+
 def get_flags():
     """Returns the flags of the current user"""
 
@@ -271,6 +280,21 @@ def _set_sqlite_pragma(dbapi_connection, connection_record):
         cursor = dbapi_connection.cursor()
         cursor.execute("PRAGMA foreign_keys=ON;")
         cursor.close()
+
+@app.route('/flag/submit/<uid>')
+@login_required
+@before_end
+def flagsubmit(uid):
+    """Handles the flag request from the vulnbox"""
+
+    if not config['attack_multi_enabled'] and not config['attack_enabled']:
+        return 'what are you doing here. go away!'
+
+    local_ip = request.remote_addr
+
+    service = get_service_flag_info(uid, local_ip)
+
+    return service['flag']
 
 @app.route('/logs')
 def logs():
@@ -378,7 +402,7 @@ def attacksubmit(flag):
     user = get_user()
 
     result = {'success': False}
-    if not config['attack_enabled']:
+    if not config['attack_enabled'] and config['attack_multi_enabled']:
         return redirect('/tasks')
 
     flag = b64decode(flag).decode('base64')

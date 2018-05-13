@@ -8,6 +8,7 @@
     "registration_enabled": false,
     "public_enabled": true,
     "attack_enabled": true,
+    "attack_multi_enabled": false,
     "isProxied": false,
     "csrf_enabled": false,
     "username_regex": "^[a-zA-Z0-9-_. &']+$",

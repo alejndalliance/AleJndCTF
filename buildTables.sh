@@ -17,6 +17,7 @@ sqlite3 ctf.db 'CREATE TABLE tasks (id INTEGER PRIMARY KEY, name TEXT, desc TEXT
 sqlite3 ctf.db 'CREATE TABLE flags (task_id INTEGER, user_id INTEGER, score INTEGER, timestamp BIGINT, ip TEXT, PRIMARY KEY (task_id, user_id), FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE CASCADE, FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE);'
 
 # Attack and Defense
+sqlite3 ctf.db 'CREATE TABLE services (id INTEGER, uid INTEGER, user_id INTEGER, flag TEXT, score INTEGER, timestamp BIGINT, ip TEXT, PRIMARY KEY (id, user_id), FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE)'
 sqlite3 ctf.db 'CREATE TABLE pwn (user_id INTEGER, target_id INTEGER, score INTEGER, timestamp BIGINT, ip TEXT, PRIMARY KEY (user_id, target_id))'
 sqlite3 ctf.db 'CREATE TABLE pwn_deduct (user_id INTEGER, deduct INTEGER, timestamp BIGINT, PRIMARY KEY (user_id), FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE)'
 
