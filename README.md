@@ -1,3 +1,7 @@
+[![Rawsec's CyberSecurity Inventory](https://inventory.rawsec.ml/img/badges/Rawsec-inventoried-FF5050_flat.svg)](https://inventory.rawsec.ml/ctf_platforms.html#AleJndCTF)
+[![GitHub stars](https://img.shields.io/github/stars/alejndalliance/AleJndCTF.svg)](https://github.com/alejndalliance/AleJndCTF/stargazers)
+[![GitHub license](https://img.shields.io/github/license/alejndalliance/AleJndCTF.svg)](https://github.com/alejndalliance/AleJndCTF/blob/master/LICENSE)
+
 AleJndCTF
 ================
 
